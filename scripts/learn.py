@@ -19,34 +19,21 @@ from keras.layers.advanced_activations import PReLU
 from sklearn.utils import class_weight
 from sklearn.model_selection import StratifiedKFold
 from data import max_text_len, max_claim_len, process_data, EMBEDDING_DIM, ROOT
-
+from sklearn.metrics import confusion_matrix
 
 batch_size = 64
 
 
 def get_confusion_matrix(y_true, y_pred):
-	preds = []
-	#code for getting cm
-	return 0
+	# preds = []
+	# for i, x in enumerate(y_pred):
+	# 	preds.append(1. if x[0] > 0.5 else 0.)
+	# return confusion_matrix(y_true, preds)
+	return confusion_matrix(y_true,y_pred)
+
 
 def visualizer(modell):
 	plot(modell, to_file=ROOT + '/vis.png', show_shapes=True)
-
-def pop_layer(model):
-	if not model.outputs:
-		raise Exception('Sequential model cannot be popped: model is empty.')
-
-	model.layers.pop()
-	if not model.layers:
-		model.outputs = []
-		model.inbound_nodes = []
-		model.outbound_nodes = []
-	else:
-		model.layers[-1].outbound_nodes = []
-		model.outputs = [model.layers[-1].output]
-	model.built = False
-	# print 'Last layer is now: ' + model.layers[-1].name
-	return model
 
 def init_model(preload=None, declare=True, data=None):
 	print 'Compiling model...'
@@ -171,11 +158,47 @@ def main(args):
 		return runner(50)
 	if mode == 'confusion':
 		model = init_model(preload=preload, declare=False)
-		data = category_data(src, target=dest)
+		data = process_data()
+		embedding_matrix = data['embedding_matrix']
+		len_word_index = data['len_word_index']
+		x_train, y_train = data['x_train'], data['y_train']
+		x_val, y_val = data['x_val'], data['y_val']
+		y_train = np.asarray(y_train,dtype=np.float32)
+		x_train_1 = np.zeros(((y_train.shape[0]),max_claim_len))
+		x_train_2 = np.zeros(((y_train.shape[0]),max_text_len))
+		x_val_1 = np.zeros(((y_val.shape[0]),max_claim_len))
+		x_val_2 = np.zeros(((y_val.shape[0]),max_text_len))
+
+		# print x_train[1][1]
+		for i in range(0,len(x_train)):
+			x_train_1[i] = x_train[i][0]
+		for i in range(0,len(x_train)):
+			x_train_2[i] = x_train[i][1]
+		
+		for i in range(0,len(x_val)):
+			x_val_1[i] = x_val[i][0]
+		for i in range(0,len(x_val)):
+			x_val_2[i] = x_val[i][1]
 		y_true = data['y_val']
-		y_pred = model.predict(data['x_val'])
-		print get_confusion_matrix(y_true, y_pred)
-	else: raise ValueError('Incorrect mode')
+		y_pred = model.predict([x_val_1,x_val_2])
+		y_t = []
+		for i in range(0,len(y_true)):
+			for j in range(0,4):
+				if y_true[i][j] == 1:
+					y_t.append(j)
+		y_p = []
+		for i in range(0,len(y_true)):
+			for j in range(0,4):
+				if y_pred[i][j] == max(y_pred[i]):
+					y_p.append(j)
+
+		print len(y_t)
+		print len(y_p)
+
+
+		print get_confusion_matrix(y_t, y_p)
+	else: 
+		raise ValueError('Incorrect mode')
 
 if __name__ == '__main__':
 	main(argv[1:])

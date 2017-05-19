@@ -62,8 +62,6 @@ def process_data():
 
 	sequences_of_texts = tokenizer.texts_to_sequences(texts)
 	sequences_of_claims = tokenizer.texts_to_sequences(claims)
-	# data = pad_sequences(sequences, maxlen=max_len)
-	# data = np.asarray(sequences)
 	claims = np.asarray(sequences_of_claims)
 	texts = np.asarray(sequences_of_texts)
 	word_index = tokenizer.word_index
@@ -71,12 +69,6 @@ def process_data():
 	l = np.zeros((len(labels),4))
 	for i in range(0,len(labels)):
 		l[i][classes[labels[i]]] = 1
-	
-	# labels = np.asarray(labels)
-	# labels = to_categorical(labels)
-	# for i in len(labels)
-	# 	labels[i] = one_hot(label[i],4)
-	# labels = np.asarray(labels)
 	labels = l
 	texts = pad_sequences(texts,maxlen=max_text_len)
 	claims = pad_sequences(claims,maxlen=max_claim_len)
@@ -117,46 +109,3 @@ def process_data():
 
 	return {'embedding_matrix':embedding_matrix,'len_word_index':len(word_index),'x_train':x_train, 'y_train':y_train, 'x_val':x_val,'y_val':y_val}
 
-
-"""
-	values = [0,0,0,0]
-	x_train = []
-	x_val = []
-	y_train = np.zeros((data.shape[0],4))
-	y_val = np.zeros((data.shape[0],4))  
-	
-	for i in range(0,y_train.shape[0]):
-		for j in range(0,4):
-			if y_train[i][j] == 1:
-				values[j] += 1
-	num_val = []
-	for j in range(0,4):
-		num_val.append(0.2*values[j])
-
-	num_val_copy = num_val
-	v = 0
-	t = 0
-
-	for i in range(0,data.shape[0]):
-		for j in range(0,4):
-			if data[i][1][j] == 1:
-				if num_val_copy[j]>0:
-					x_val.append(data[i])
-					y_val[v] = labels[i]
-					v += 1
-					num_val_copy -= 1
-				else:
-					x_train.append(data[i])
-					y_train[t] = labels[i]
-					t += 1
-"""
-			# else:
-			# 	x_train.append(data[i])
-			# 	y_train[t] = labels[i]
-			# 	t += 1
-	
-	# x_train = data[:-nb_validation_samples]
-	# x_val = data[-nb_validation_samples:]
-	# y_train = labels[:-nb_validation_samples]
-	# y_val = labels[-nb_validation_samples:]
-	
