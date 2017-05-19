@@ -26,9 +26,8 @@ batch_size = 64
 
 def get_confusion_matrix(y_true, y_pred):
 	preds = []
-	for i, x in enumerate(y_pred):
-		preds.append(1. if x[0] > 0.5 else 0.)
-	return confusion_matrix(y_true, preds)
+	#code for getting cm
+	return 0
 
 def visualizer(modell):
 	plot(modell, to_file=ROOT + '/vis.png', show_shapes=True)
