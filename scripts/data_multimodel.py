@@ -114,10 +114,51 @@ def process_data():
 		y_train, y_val = y[train_indices], y[val_indices]
 		break  
 
+	#X TRAINING AND VALIDATION DATA
+	x_train_1 = np.zeros(((y_train.shape[0]),max_claim_len))
+	x_train_2 = np.zeros(((y_train.shape[0]),max_text_len))
+	x_val_1 = np.zeros(((y_val.shape[0]),max_claim_len))
+	x_val_2 = np.zeros(((y_val.shape[0]),max_text_len))
+	for i in range(0,len(x_train)):
+		x_train_1[i] = x_train[i][0]
+	for i in range(0,len(x_train)):
+		x_train_2[i] = x_train[i][1]
+	for i in range(0,len(x_val)):
+		x_val_1[i] = x_val[i][0]
+	for i in range(0,len(x_val)):
+		x_val_2[i] = x_val[i][1]
+
+
+	#Y_TRAINING AND VALIDATION DATA
+	#MAIN OUTPUT 
+	trainy = np.zeros((y_train.shape[0],4))
+	valy = np.zeros((y_val.shape[0],4))
+	#AUXILIARY OUTPUT : RELATED/UNRELATED
+	labels2_train = []
+	labels2_val = []
+	for i in range(0,y_train.shape[0]):
+		for j in range(0,4):
+			trainy[i][j] = y_train[i][j]
+	for i in range(0,y_val.shape[0]):
+		for j in range(0,4):
+			valy[i][j] = y_val[i][j]
+	for i in range(0,y_train.shape[0]):
+		labels2_train.append(y_train[i][4])
+	for i in range(0,y_val.shape[0]):
+		labels2_val.append(y_val[i][4])
+	y2_train = np.asarray(labels2_train)
+	y2_val = np.asarray(labels2_val)
+	y1_train = trainy
+	y1_val = valy
+
 	return {'embedding_matrix':embedding_matrix,
 			'len_word_index':len(word_index),
-			'x_train':x_train, 
-			'y_train':y_train, 
-			'x_val':x_val,
-			'y_val':y_val}
+			'x_train_claim':x_train_1, 
+			'x_train_text':x_train_2, 
+			'y1_train':y1_train,
+			'y1_val':y1_val,
+			'y2_train':y2_train,
+			'y2_val':y2_val,
+			'x_val_claim':x_val_1,
+			'x_val_text':x_val_2}
 
